@@ -125,6 +125,15 @@ Test output (screenshots, exported .md, results.json) goes to `tests/out/`.
 
 Nothing leaves the browser. The extension only runs on the tab you click it on (`activeTab`), has no host permissions and makes no network requests. "Keep as is" choices are stored locally per site.
 
-## License
+## Credits
+
+Most of the copy rules (the stock-phrase list, "not just X, it's Y" contrasts and similar patterns) are based on:
+
+- [humanizer](https://github.com/blader/humanizer) by Siqi Chen ([@blader](https://github.com/blader)), MIT licensed.
+- [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing), maintained by WikiProject AI Cleanup, which humanizer is built on.
+
+Slop Teller turns those patterns into page and commit checks; any mistakes in the rules are its own.
+
+
 
 MIT. See [LICENSE](LICENSE).
