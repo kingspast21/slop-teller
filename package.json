@@ -1,12 +1,13 @@
 {
   "name": "slop-teller",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "description": "Browser extension that scores a page for AI tells and exports a Markdown fix list.",
   "type": "module",
   "scripts": {
     "test": "node tests/run.mjs",
+    "test:hook": "node tests/hook.test.mjs",
     "icons": "uv run -q --with pillow python tools/make_icons.py",
     "zip": "node tools/build-zip.mjs"
   },

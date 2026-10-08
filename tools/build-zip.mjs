@@ -12,5 +12,5 @@ fs.mkdirSync(dist, { recursive: true });
 const out = path.join(dist, `slop-teller-v${version}.zip`);
 fs.rmSync(out, { force: true });
 // git archive gives a clean zip of tracked files only, so local test output never slips in.
-execFileSync('git', ['archive', '--format=zip', '--prefix=slop-teller/', '-o', out, 'HEAD', 'manifest.json', 'src', 'icons', 'LICENSE', 'README.md'], { cwd: ROOT });
+execFileSync('git', ['archive', '--format=zip', '--prefix=slop-teller/', '-o', out, 'HEAD', 'manifest.json', 'src', 'icons', 'hook', 'LICENSE', 'README.md'], { cwd: ROOT });
 console.log(out);

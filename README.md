@@ -1,6 +1,6 @@
 # Slop Teller
 
-A Chrome extension that scores a web page for **AI tells**, marks each one on the page, and exports a Markdown fix list you can hand to an AI assistant.
+A Chrome extension that scores a web page for **AI tells**, marks each one on the page, and exports a Markdown fix list you can hand to an AI assistant. It also comes with a git commit hook that warns about the same tells before you commit.
 
 ![Slop Teller stepping through stock phrases on a test page](docs/screenshot.png)
 
@@ -43,13 +43,77 @@ The file opens with instructions for the assistant (find each item in the repo b
 
 ## Editing the rules
 
-All patterns, weights, caps and the "why / how to fix" wording live in `src/rules.js`. Design detectors are in `src/scanner.js` under the same ids.
+All patterns, weights, caps and the "why / how to fix" wording live in `src/rules.js`. Design detectors are in `src/scanner.js` under the same ids. The commit hook reads the same file (reinstall the hook to pick up rule changes).
+
+## Commit hook (slop-hook)
+
+The same rules, run on `git commit`. It checks only the lines you're adding, prints what it found, and **lets the commit through**. It's a warning, not a gate.
+
+```
+slop-hook: 3 AI tells in 2 files (commit continues)
+  src/Hero.astro:14  em dash       "...fast — and simple"
+  src/Hero.astro:22  stock phrase  "Our seamless platform..."
+  README.md:8        stock phrase  "...elevate your workflow"
+```
+
+Install it in any repo (needs Node):
+
+```bash
+cd your-repo
+node path/to/slop-teller/hook/install.mjs
+```
+
+It copies itself into `.git/slop-hook/` and adds one line to `.git/hooks/pre-commit`. An existing pre-commit hook is kept, and husky setups get the line in `.husky/pre-commit`.
+
+**Keeping a tell on purpose**
+
+- One line: put `slop-ok` in a comment on it (`<!-- slop-ok -->`, `// slop-ok`, `{/* slop-ok */}`).
+- A whole tell or folder, in `.slophook.json` at the repo root:
+  ```json
+  { "off": ["em-dash"], "ignore": ["docs/legal/**"] }
+  ```
+- One commit: `git commit --no-verify`.
+
+**Stricter, if you want it**
+
+`--mode ask` asks "Commit anyway? [Y/n]" (Enter means yes). `--mode block` stops the commit. Both are saved to `.slophook.json`. When there's no terminal to ask in, such as an editor's commit button or an AI agent, `ask` warns and lets the commit through, so it never hangs.
+
+What it checks: copy in `.html`, `.md`, `.astro`, `.vue`, `.svelte`, `.jsx`/`.tsx` text and strings, content JSON and templates, plus AI builder scripts in HTML. It skips code comments, class names, lockfiles, `node_modules` and build output. Design tells need a rendered page, so they stay in the extension.
+
+Check a whole repo without committing:
+
+```bash
+node .git/slop-hook/slop-hook.mjs --all          # or --all --json
+```
+
+Remove it: `node path/to/slop-teller/hook/install.mjs --uninstall`
+
+## Using AI agents to commit or push your repos?
+
+Coding agents (Claude Code, Codex, Cursor, Copilot, Gemini) run `git commit` for you, see the hook's output, and often say nothing about it. Install with `--agents` and the hook adds a short note to the files those agents read:
+
+```bash
+node path/to/slop-teller/hook/install.mjs --agents
+```
+
+It adds the note to whichever of `AGENTS.md`, `CLAUDE.md`, `GEMINI.md` and `.github/copilot-instructions.md` already exist, or creates `AGENTS.md` if none do. Pick files yourself with `--agent-files AGENTS.md,CLAUDE.md` (Claude Code reads `CLAUDE.md`).
+
+The note tells the agent to:
+
+- read the slop-hook output after each commit,
+- **tell you** how many tells it found, with each `file:line`, and whether the commit went through,
+- **not** fix them, add `slop-ok`, change `.slophook.json` or use `--no-verify` unless you ask.
+
+You decide what stays. The note sits between `<!-- slop-hook:start -->` and `<!-- slop-hook:end -->`, so reinstalling updates it in place and `--uninstall` removes it cleanly. Those files are part of your repo, so commit the change if your team should get it too.
+
+Even without the note, the hook adds a line addressed to AI agents whenever it runs without a terminal, which is how agents run it.
 
 ## Development
 
 ```bash
 npm install          # Playwright, for tests only
 npm test             # loads the real extension in Chromium against tests/fixtures
+npm run test:hook    # slop-hook in throwaway git repos
 node tests/run.mjs https://example.com   # also scan real sites
 npm run icons        # redraw icons (needs uv)
 npm run zip          # dist/slop-teller-v<version>.zip from the last commit

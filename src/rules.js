@@ -70,7 +70,8 @@ globalThis.SlopRules = globalThis.SlopRules || {
       label: 'Emoji used as bullets or icons',
       short: 'emoji bullet',
       scope: 'body',
-      pattern: '^\\s*[\\p{Extended_Pictographic}\\u2705\\u2728]',
+      // An emoji followed by text, like a bullet. Arrows used as link icons don't count.
+      pattern: '^\\s*(?![\\u2190-\\u21FF\\u27A1\\u2B05-\\u2B07])[\\p{Extended_Pictographic}\\u2705\\u2728]\\uFE0F?\\s+\\S',
       flags: 'u',
       weight: 2,
       cap: 10,

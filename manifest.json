@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Slop Teller",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Scores a page for AI tells, marks each one on the page, and exports a fix list as Markdown.",
   "action": {
     "default_title": "Slop Teller: scan this page",
